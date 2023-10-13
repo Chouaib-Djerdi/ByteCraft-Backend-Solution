@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status, views
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 
 # Create your views here.
 
@@ -19,10 +19,11 @@ class SignupView(views.APIView):
 
 class LoginView(views.APIView):
     def post(self, request, *args, **kwargs):
-        username = request.data.get("username", "")
-        password = request.data.get("password", "")
+        username = request.data.get("username")
+        password = request.data.get("password")
         user = authenticate(request, username=username, password=password)
         if user is not None:
+            login(request, user)
             refresh = RefreshToken.for_user(user)
             return Response(
                 {
